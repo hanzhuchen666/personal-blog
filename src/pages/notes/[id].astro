@@ -1,0 +1,55 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+import {
+  getCollection,
+  render,
+} from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection(
+    "posts",
+    ({ data }) => !data.draft
+  );
+
+  return posts.map((post) => ({
+    params: {
+      id: post.id,
+    },
+
+    props: {
+      post,
+    },
+  }));
+}
+
+const { post } = Astro.props;
+
+const { Content } = await render(post);
+---
+
+<BaseLayout
+  title={post.data.title}
+  description={post.data.description}
+>
+  <article>
+    <header>
+      <h1>{post.data.title}</h1>
+
+      <p class="article-meta">
+        发布于
+        <time datetime={post.data.pubDate.toISOString()}>
+          {post.data.pubDate.toISOString().slice(0, 10)}
+        </time>
+      </p>
+    </header>
+
+    <Content />
+
+    <hr />
+
+    <p>
+      <a href="/notes/">← 返回文章列表</a>
+    </p>
+  </article>
+</BaseLayout>
