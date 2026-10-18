@@ -1,23 +1,21 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import { getCollection } from "astro:content";
+const experiments = (await getCollection("experiments", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 ---
-
 <BaseLayout title="交互实验">
   <h1>交互实验</h1>
-
-  <p>
-    使用浏览器运行的技术演示与实验。
-  </p>
-
+  <p>使用浏览器运行的技术演示与实验。</p>
   <ul class="article-list">
-    <li>
-      <a href="/experiments/demo/">
-        第一个 marimo 实验
-      </a>
-
-      <p>
-        演示 Python 在浏览器中的交互执行。
-      </p>
-    </li>
+    {experiments.map((experiment) => (
+      <li>
+        <a href={`/experiments/${experiment.id}/`}>{experiment.data.title}</a>
+        <time datetime={experiment.data.pubDate.toISOString()}>
+          {experiment.data.pubDate.toISOString().slice(0, 10)}
+        </time>
+        <p>{experiment.data.description}</p>
+      </li>
+    ))}
   </ul>
 </BaseLayout>

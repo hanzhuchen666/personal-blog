@@ -21,6 +21,15 @@ const posts = defineCollection({
   }),
 });
 
-export const collections = {
-  posts,
-};
+const experiments = defineCollection({
+  loader: glob({ base: "./src/content/experiments", pattern: "**/*.md" }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    pubDate: z.coerce.date(),
+    draft: z.boolean().default(false),
+    app: z.string().startsWith("/experiments/apps/"),
+  }),
+});
+
+export const collections = { posts, experiments };

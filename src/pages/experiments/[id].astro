@@ -1,0 +1,65 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Giscus from "../../components/Giscus.astro";
+import Feedback from "../../components/Feedback.astro";
+import { getCollection, render } from "astro:content";
+
+export async function getStaticPaths() {
+  const experiments = await getCollection("experiments", ({ data }) => !data.draft);
+  return experiments.map((experiment) => ({
+    params: { id: experiment.id }, props: { experiment },
+  }));
+}
+const { experiment } = Astro.props;
+const { Content } = await render(experiment);
+---
+<BaseLayout title={experiment.data.title} description={experiment.data.description}>
+  <article>
+    <header>
+      <h1>{experiment.data.title}</h1>
+      <p class="article-meta">
+        发布于 <time datetime={experiment.data.pubDate.toISOString()}>
+          {experiment.data.pubDate.toISOString().slice(0, 10)}
+        </time>
+      </p>
+    </header>
+    <Content />
+    <section class="experiment-player" aria-label="交互实验">
+      <div class="experiment-controls">
+        <button type="button" data-start-experiment>启动交互实验</button>
+        <a href={experiment.data.app} target="_blank" rel="noopener">在新窗口打开 ↗</a>
+      </div>
+      <p class="article-meta" role="status" data-experiment-status>
+        点击启动后加载运行环境。首次启动需要下载 Python 和依赖，请稍候。
+      </p>
+      <iframe hidden data-experiment-frame data-src={experiment.data.app}
+        title={experiment.data.title} allow="fullscreen" allowfullscreen></iframe>
+      <noscript><p>请通过“在新窗口打开”链接访问实验。</p></noscript>
+    </section>
+    <hr />
+    <p><a href="/experiments/">← 返回实验列表</a></p>
+    <Giscus />
+  </article>
+  <Feedback title={experiment.data.title} />
+</BaseLayout>
+<script>
+  const button = document.querySelector<HTMLButtonElement>("[data-start-experiment]");
+  const frame = document.querySelector<HTMLIFrameElement>("[data-experiment-frame]");
+  const status = document.querySelector<HTMLElement>("[data-experiment-status]");
+  button?.addEventListener("click", () => {
+    if (!frame || !frame.dataset.src) return;
+    frame.src = frame.dataset.src;
+    frame.hidden = false;
+    button.hidden = true;
+    if (status) status.textContent = "实验已启动，运行环境的加载进度显示在下方。也可在新窗口打开以获得更大视野。";
+  }, { once: true });
+</script>
+<style>
+  .experiment-player { margin-block: 2rem; }
+  .experiment-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; }
+  button { font: inherit; padding: .5rem 1rem; color: var(--link); background: var(--background); border: 1px solid var(--border); border-radius: 4px; cursor: pointer; }
+  button:hover { border-color: var(--link); }
+  button:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; }
+  iframe { width: 100%; height: 80vh; min-height: 600px; border: 1px solid var(--border); border-radius: 4px; background: white; }
+  [hidden] { display: none; }
+</style>
