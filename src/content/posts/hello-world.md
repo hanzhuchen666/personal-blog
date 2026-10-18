@@ -31,7 +31,13 @@ def fibonacci(n: int) -> int:
 
 ## 数学内容
 
-后续会加入 LaTeX 数学公式支持。
+测试换行公式：
+
+$$
+    \text{Outcome} = \beta_0 + \beta_1 + \epsilon
+$$
+
+测试行内公式 $\alpha$ 和 $\mu$
 
 ## 参考资料
 
