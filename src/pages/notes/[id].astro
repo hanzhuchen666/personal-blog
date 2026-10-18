@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import Giscus from "../../components/Giscus.astro";
+import Feedback from "../../components/Feedback.astro";
 
 import {
   getCollection,
@@ -51,5 +53,8 @@ const { Content } = await render(post);
     <p>
       <a href="/notes/">← 返回文章列表</a>
     </p>
+
+    <Giscus />
   </article>
+  <Feedback title={post.data.title} />
 </BaseLayout>

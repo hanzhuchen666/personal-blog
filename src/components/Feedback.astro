@@ -1,0 +1,33 @@
+---
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+
+const email = "hanzhuchen666@gmail.com";
+
+const subject = encodeURIComponent(
+  `博客反馈：${title}`
+);
+
+const body = encodeURIComponent(
+  `文章：${Astro.url.href}\n\n反馈内容：\n`
+);
+
+const href =
+  `mailto:${email}?subject=${subject}&body=${body}`;
+---
+
+<section class="feedback">
+  <h2>反馈</h2>
+
+  <p>
+    如果发现文章有误，或希望提出改进建议，
+    可以通过邮件联系。
+  </p>
+
+  <a href={href}>
+    提交反馈
+  </a>
+</section>
