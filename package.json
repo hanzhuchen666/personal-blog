@@ -8,17 +8,25 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build && node scripts/check-static-assets.mjs",
+    "build:pdf": "playwright install chromium && node bin/build-pdf.ts",
+    "check": "astro check && prettier . --check",
     "preview": "astro preview",
     "astro": "astro"
   },
   "dependencies": {
     "@astrojs/markdown-remark": "^7.3.3",
+    "@primer/octicons": "^19.40.0",
     "astro": "^7.4.0",
+    "github-markdown-css": "^5.9.0",
     "katex": "^0.19.0",
-    "rehype-katex": "^7.0.1",
-    "remark-math": "^6.0.0"
+    "rehype-katex": "^1.2.0",
+    "remark-math": "^3.0.1"
   },
   "allowScripts": {
     "fsevents@2.3.3": true
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5"
   }
 }
