@@ -5,10 +5,12 @@ import "../styles/global.css";
 interface Props {
   title: string;
   description?: string;
+  hideGitHubLink?: boolean;
 }
 
 const {
   title,
+  hideGitHubLink = false,
   description = "技术研究与工程笔记",
 } = Astro.props;
 ---
@@ -52,7 +54,7 @@ const {
     <footer class="site-footer">
       <div class="container">
         <span>Personal Notes</span>
-        <a href="https://github.com/">GitHub</a>
+        {!hideGitHubLink && <a href="https://github.com/">GitHub</a>}
       </div>
     </footer>
   </body>

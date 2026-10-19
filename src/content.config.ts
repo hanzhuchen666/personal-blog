@@ -60,6 +60,22 @@ const work = defineCollection({
   }),
 });
 
+const cv = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/cv" }),
+  schema: z.object({
+    name: z.string(),
+    title: z.string(),
+    phone: z.string(),
+    email: z.email(),
+    contactNotice: z.string(),
+    contacts: z.array(z.object({
+      label: z.string(),
+      placeholder: z.string(),
+      url: z.url().optional(),
+    })),
+  }),
+});
+
 const posts = defineCollection({
   loader: glob({
     base: "./src/content/posts",
@@ -86,4 +102,4 @@ const experiments = defineCollection({
   }),
 });
 
-export const collections = { posts, experiments, projects, work };
+export const collections = { posts, experiments, projects, work, cv };
