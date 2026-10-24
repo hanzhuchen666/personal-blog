@@ -1,0 +1,56 @@
+---
+import type { CollectionEntry } from "astro:content";
+interface Props {
+  posts: CollectionEntry<"posts">[];
+  headingLevel?: "h2" | "h3";
+}
+const { posts, headingLevel: Heading = "h3" } = Astro.props;
+---
+
+{posts.length ? (
+  <ul class:list={["post-grid", { "post-grid--single": posts.length === 1 }]}>
+    {posts.map(post => (
+      <li>
+        <a class="post-card" href={`/notes/${post.id}/`}>
+          <time datetime={post.data.pubDate.toISOString()}>{post.data.pubDate.toISOString().slice(0, 10).replaceAll("-", ".")}</time>
+          <Heading class="post-card__title">{post.data.title}</Heading>
+          <p>{post.data.description}</p>
+          <span class="post-card__arrow" aria-hidden="true">↗</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+) : <p class="empty-state">暂无文章。</p>}
+
+<style>
+  .post-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; list-style: none; padding: 0; margin: 0; }
+  .post-grid--single { grid-template-columns: 1fr; }
+  .post-grid li { min-width: 0; }
+  .post-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    height: 100%;
+    padding: 27px 62px 28px 28px;
+    border: 1px solid #e3e7e9;
+    border-radius: 10px;
+    color: #252d34;
+    background: #fff;
+    text-decoration: none;
+    transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+    overflow-wrap: anywhere;
+  }
+  time { color: #7c858c; font-size: 11px; letter-spacing: 0.08em; font-variant-numeric: tabular-nums; }
+  .post-card__title { margin: 14px 0 9px; color: #252d34; font-size: 19px; font-weight: 550; line-height: 1.5; }
+  .post-card p { margin: 0; color: #747c83; font-size: 14px; line-height: 1.8; }
+  .post-card__arrow { position: absolute; right: 26px; top: 26px; color: #89939b; font-size: 21px; }
+  .post-card:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; }
+  @media (hover: hover) { .post-card:hover { border-color: #b6c6d0; box-shadow: 0 8px 24px #1e334208; } }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) { .post-card:hover { transform: scale(1.012); } }
+  @media (prefers-reduced-motion: reduce) { .post-card { transition: none; } }
+  @media (max-width: 600px) {
+    .post-grid { grid-template-columns: 1fr; }
+    .post-card { padding: 24px 50px 24px 24px; }
+  }
+</style>

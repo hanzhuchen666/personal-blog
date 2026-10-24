@@ -1,67 +1,20 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
+import HomeHero from "../components/home/HomeHero.astro";
+import RecentPosts from "../components/home/RecentPosts.astro";
+import FeaturedExperiment from "../components/home/FeaturedExperiment.astro";
 
-const posts = (await getCollection(
-  "posts",
-  ({ data }) => !data.draft
-))
-  .sort(
-    (a, b) =>
-      b.data.pubDate.getTime() -
-      a.data.pubDate.getTime()
-  )
-  .slice(0, 5);
+const posts = (await getCollection("posts", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime())
+  .slice(0, 4);
+const experiments = (await getCollection("experiments", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const featured = experiments[0];
 ---
 
-<BaseLayout
-  title="首页"
-  description="个人技术研究、工程实践与学习笔记"
->
-  <section>
-    <h1>Research & Engineering Notes</h1>
-
-    <p>
-      记录机器人、控制理论、制造系统、
-      软件工程及相关研究。
-    </p>
-
-    <p>
-      这里主要保存技术笔记、实验与长期研究成果。
-    </p>
-  </section>
-
-  <section>
-    <h2>近期文章</h2>
-
-    <ul class="article-list">
-      {posts.map((post) => (
-        <li>
-          <a href={`/notes/${post.id}/`}>
-            {post.data.title}
-          </a>
-
-          <time datetime={post.data.pubDate.toISOString()}>
-            {post.data.pubDate.toISOString().slice(0, 10)}
-          </time>
-        </li>
-      ))}
-    </ul>
-
-    <p>
-      <a href="/notes/">查看全部文章 →</a>
-    </p>
-  </section>
-
-  <section>
-    <h2>交互实验</h2>
-
-    <p>
-      一些可以在浏览器中运行的实验与技术演示。
-    </p>
-
-    <p>
-      <a href="/experiments/">查看实验 →</a>
-    </p>
-  </section>
+<BaseLayout title="首页" description="个人技术研究、工程实践与学习笔记" wide hideGitHubLink>
+  <HomeHero />
+  <RecentPosts posts={posts} />
+  {featured && <FeaturedExperiment experiment={featured} />}
 </BaseLayout>

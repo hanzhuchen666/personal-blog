@@ -1,21 +1,25 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
+import ListHeader from "../../components/ListHeader.astro";
+import ExperimentCard from "../../components/ExperimentCard.astro";
+
 const experiments = (await getCollection("experiments", ({ data }) => !data.draft))
   .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 ---
-<BaseLayout title="交互实验">
-  <h1>交互实验</h1>
-  <p>使用浏览器运行的技术演示与实验。</p>
-  <ul class="article-list">
-    {experiments.map((experiment) => (
-      <li>
-        <a href={`/experiments/${experiment.id}/`}>{experiment.data.title}</a>
-        <time datetime={experiment.data.pubDate.toISOString()}>
-          {experiment.data.pubDate.toISOString().slice(0, 10)}
-        </time>
-        <p>{experiment.data.description}</p>
-      </li>
-    ))}
-  </ul>
+
+<BaseLayout title="全部实验" description="浏览器交互实验与技术演示" wide hideGitHubLink>
+  <ListHeader title="全部实验" />
+  {experiments.length ? (
+    <ul class="experiment-list">
+      {experiments.map(experiment => (
+        <li><ExperimentCard experiment={experiment} headingLevel="h2" showDate /></li>
+      ))}
+    </ul>
+  ) : <p>暂无实验。</p>}
 </BaseLayout>
+
+<style>
+  .experiment-list { display: grid; gap: 24px; margin: 0; padding: 0; list-style: none; }
+  .experiment-list li { min-width: 0; }
+</style>

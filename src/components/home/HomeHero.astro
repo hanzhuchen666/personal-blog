@@ -1,0 +1,86 @@
+---
+import { Content, frontmatter } from "../../content/home.md";
+---
+
+<section class="hero" aria-labelledby="home-heading">
+  <p class="eyebrow">{frontmatter.eyebrow}</p>
+  <h1 id="home-heading">
+    {frontmatter.heading.map((line: string) => <span>{line}</span>)}
+  </h1>
+  <div class="hero__intro"><Content /></div>
+  <div class="hero__actions">
+    <a class="primary-link" href={frontmatter.primaryLink.href}>
+      {frontmatter.primaryLink.label}<span aria-hidden="true">↗</span>
+    </a>
+    <a class="secondary-link" href={frontmatter.secondaryLink.href}>
+      {frontmatter.secondaryLink.label}<span aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    padding-block: 76px 88px;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    inset: -48px calc((1040px - 100vw) / 2) 0;
+    background-image:
+      linear-gradient(to right, #4f4f4f2e 1px, transparent 1px),
+      linear-gradient(to bottom, #4f4f4f2e 1px, transparent 1px);
+    background-size: 14px 24px;
+    mask-image: radial-gradient(ellipse 80% 50% at 50% 0%, #000 70%, transparent 110%);
+    opacity: 0.42;
+  }
+  .eyebrow {
+    margin: 0 0 22px;
+    color: #626b73;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+  }
+  h1 {
+    margin: 0;
+    color: #1f252b;
+    font-size: clamp(2.4rem, 5.1vw, 4.2rem);
+    line-height: 1.24;
+    font-weight: 600;
+    letter-spacing: -0.055em;
+  }
+  h1 span { display: block; }
+  .hero__intro { margin-block: 26px 30px; color: #626b73; font-size: 16px; line-height: 1.95; }
+  .hero__intro :global(p) { margin: 0; }
+  .hero__actions { display: flex; flex-wrap: wrap; align-items: center; gap: 28px; }
+  .hero__actions a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 26px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .hero__actions a span { transition: transform 200ms ease; }
+  .primary-link { min-height: 46px; padding: 10px 20px; border-radius: 6px; background: #252d34; color: white; transition: background 200ms ease; }
+  .primary-link:hover { background: #344957; }
+  .secondary-link { min-height: 46px; color: #44525d; }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .hero__actions a:hover span { transform: translateX(3px); }
+  }
+  @media (max-width: 1080px) {
+    .hero::before { inset-inline: -20px; }
+  }
+  @media (max-width: 600px) {
+    .hero { padding-block: 42px 56px; }
+    .hero::before { top: -32px; }
+    .eyebrow { font-size: 10px; letter-spacing: 0.13em; }
+    .hero__intro { font-size: 14px; margin-block: 22px 26px; }
+    .hero__actions { gap: 24px; }
+    .hero__actions a { gap: 18px; }
+  }
+</style>

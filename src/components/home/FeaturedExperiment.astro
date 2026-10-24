@@ -1,0 +1,25 @@
+---
+import type { CollectionEntry } from "astro:content";
+import ExperimentCard from "../ExperimentCard.astro";
+interface Props { experiment: CollectionEntry<"experiments">; }
+const { experiment } = Astro.props;
+---
+
+<section class="featured" aria-labelledby="featured-heading">
+  <div class="section-heading">
+    <h2 id="featured-heading">精选实验</h2>
+    <a href="/experiments/">全部实验 <span aria-hidden="true">→</span></a>
+  </div>
+  <ExperimentCard experiment={experiment} />
+</section>
+
+<style>
+  .featured { margin-top: 58px; }
+  .section-heading { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 24px; }
+  h2 { margin: 0; font-size: 23px; font-weight: 600; letter-spacing: -0.025em; }
+  .section-heading > a { display: inline-flex; align-items: center; gap: 12px; min-height: 38px; color: #53616c; font-size: 13px; white-space: nowrap; }
+  @media (max-width: 600px) {
+    .featured { margin-top: 42px; }
+    h2 { font-size: 21px; }
+  }
+</style>

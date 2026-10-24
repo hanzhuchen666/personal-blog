@@ -1,0 +1,25 @@
+---
+import type { CollectionEntry } from "astro:content";
+import PostGrid from "../PostGrid.astro";
+interface Props { posts: CollectionEntry<"posts">[]; }
+const { posts } = Astro.props;
+---
+
+<section class="recent-posts" aria-labelledby="recent-posts-heading">
+  <div class="section-heading">
+    <h2 id="recent-posts-heading">近期文章</h2>
+    <a href="/notes/">全部文章 <span aria-hidden="true">→</span></a>
+  </div>
+  <PostGrid posts={posts} />
+</section>
+
+<style>
+  .recent-posts { padding-top: 36px; border-top: 1px solid #e3e7e9; }
+  .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
+  h2 { margin: 0; font-size: 23px; font-weight: 600; letter-spacing: -0.025em; }
+  .section-heading > a { display: inline-flex; align-items: center; gap: 12px; min-height: 38px; color: #53616c; white-space: nowrap; font-size: 13px; }
+  @media (max-width: 600px) {
+    .recent-posts { padding-top: 28px; }
+    h2 { font-size: 21px; }
+  }
+</style>

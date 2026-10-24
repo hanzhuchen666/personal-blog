@@ -6,11 +6,13 @@ interface Props {
   title: string;
   description?: string;
   hideGitHubLink?: boolean;
+  wide?: boolean;
 }
 
 const {
   title,
   hideGitHubLink = false,
+  wide = false,
   description = "技术研究与工程笔记",
 } = Astro.props;
 ---
@@ -32,7 +34,7 @@ const {
 
   <body>
     <header class="site-header">
-      <div class="container header-inner">
+      <div class:list={["container", "header-inner", { "layout-wide": wide }]}>
         <a class="site-name" href="/">
           Personal Notes
         </a>
@@ -47,15 +49,19 @@ const {
       </div>
     </header>
 
-    <main class="container">
+    <main class:list={["container", { "layout-wide": wide }]}>
       <slot />
     </main>
 
     <footer class="site-footer">
-      <div class="container">
+      <div class:list={["container", { "layout-wide": wide }]}>
         <span>Personal Notes</span>
         {!hideGitHubLink && <a href="https://github.com/">GitHub</a>}
       </div>
     </footer>
   </body>
 </html>
+
+<style>
+  .layout-wide { --content-width: 1040px; }
+</style>

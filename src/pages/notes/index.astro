@@ -1,37 +1,14 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
+import ListHeader from "../../components/ListHeader.astro";
+import PostGrid from "../../components/PostGrid.astro";
 
-const posts = (await getCollection(
-  "posts",
-  ({ data }) => !data.draft
-)).sort(
-  (a, b) =>
-    b.data.pubDate.getTime() -
-    a.data.pubDate.getTime()
-);
+const posts = (await getCollection("posts", ({ data }) => !data.draft))
+  .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 ---
 
-<BaseLayout title="技术笔记">
-  <h1>技术笔记</h1>
-
-  <p>
-    技术研究、工程实践和学习过程中的记录。
-  </p>
-
-  <ul class="article-list">
-    {posts.map((post) => (
-      <li>
-        <a href={`/notes/${post.id}/`}>
-          {post.data.title}
-        </a>
-
-        <time datetime={post.data.pubDate.toISOString()}>
-          {post.data.pubDate.toISOString().slice(0, 10)}
-        </time>
-
-        <p>{post.data.description}</p>
-      </li>
-    ))}
-  </ul>
+<BaseLayout title="全部文章" description="技术笔记与文章归档" wide hideGitHubLink>
+  <ListHeader title="全部文章" />
+  <PostGrid posts={posts} headingLevel="h2" />
 </BaseLayout>

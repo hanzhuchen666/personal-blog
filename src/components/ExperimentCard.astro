@@ -1,0 +1,53 @@
+---
+import type { CollectionEntry } from "astro:content";
+import BoidsPreview from "./home/BoidsPreview.astro";
+interface Props { experiment: CollectionEntry<"experiments">; headingLevel?: "h2" | "h3"; showDate?: boolean; }
+const { experiment, headingLevel: Heading = "h3", showDate = false } = Astro.props;
+const titleSeparator = experiment.data.title.indexOf("：");
+const titleName = titleSeparator >= 0 ? experiment.data.title.slice(0, titleSeparator) : "";
+const titleDescription = titleSeparator >= 0 ? experiment.data.title.slice(titleSeparator + 1) : experiment.data.title;
+---
+
+<a class="experiment-card" href={`/experiments/${experiment.id}/`}>
+    <div class="experiment-card__visual">
+      {experiment.id === "boids" ? <BoidsPreview /> : <div class="experiment-card__generic" aria-hidden="true">↗</div>}
+    </div>
+    <div class="experiment-card__body">
+      {showDate ? (
+        <time class="experiment-card__label" datetime={experiment.data.pubDate.toISOString()}>{experiment.data.pubDate.toISOString().slice(0, 10).replaceAll("-", ".")}</time>
+      ) : <span class="experiment-card__label">浏览器交互实验</span>}
+      <Heading class="experiment-card__title">{titleName && <span class="experiment-card__name">{titleName}</span>}{titleDescription}</Heading>
+      <p>{experiment.data.description}</p>
+      <span class="experiment-card__action">进入实验 <span aria-hidden="true">↗</span></span>
+    </div>
+  </a>
+
+<style>
+  .experiment-card { display: grid; grid-template-columns: 1.15fr 1fr; overflow: hidden; border: 1px solid #e3e7e9; border-radius: 12px; color: #252d34; text-decoration: none; background: white; transition: border-color 220ms ease; }
+  .experiment-card__visual { display: grid; place-items: center; overflow: hidden; background: #f2f5f7; }
+  .experiment-card__visual :global(svg) { display: block; width: 100%; height: 100%; min-height: 100%; object-fit: cover; transition: transform 400ms ease; }
+  .experiment-card__body { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 38px; }
+  .experiment-card__label { color: #6c818f; font-size: 11px; letter-spacing: 0.09em; }
+  .experiment-card__title { margin: 18px 0 15px; color: #252d34; font-size: 27px; font-weight: 550; line-height: 1.5; letter-spacing: -0.025em; text-wrap: balance; }
+  .experiment-card__name { display: block; margin-bottom: 5px; font-size: 1.15em; letter-spacing: -0.04em; }
+  .experiment-card__body p { margin: 0; color: #727c84; font-size: 14px; line-height: 1.9; }
+  .experiment-card__action { display: inline-flex; gap: 24px; align-items: center; margin-top: 30px; color: #345e78; font-size: 13px; font-weight: 500; }
+  .experiment-card__generic { padding: 60px; color: #8199a9; font-size: 80px; }
+  .experiment-card:focus-visible { outline: 2px solid var(--link); outline-offset: 4px; }
+  @media (hover: hover) { .experiment-card:hover { border-color: #b6c6d0; } }
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .experiment-card:hover .experiment-card__visual :global(svg) { transform: scale(1.04); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .experiment-card, .experiment-card__visual :global(svg) { transition: none; }
+  }
+  @media (max-width: 700px) {
+    .experiment-card { grid-template-columns: 1fr; }
+    .experiment-card__visual { aspect-ratio: 1.8; }
+    .experiment-card__body { padding: 28px; }
+    .experiment-card__title { font-size: 24px; }
+  }
+  @media (max-width: 600px) {
+    .experiment-card__body { padding: 26px 24px; }
+  }
+</style>

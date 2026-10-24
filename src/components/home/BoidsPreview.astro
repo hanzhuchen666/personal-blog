@@ -1,0 +1,33 @@
+---
+// A static illustration of the existing Boids experiment; no simulation runs on the homepage.
+const birds = Array.from({ length: 64 }, (_, i) => {
+  const angle = i * 2.39996;
+  const radius = Math.sqrt((i + 1) / 64);
+  return {
+    x: 290 + Math.cos(angle) * radius * 206,
+    y: 202 + Math.sin(angle) * radius * 118,
+    rotation: -22 + Math.cos(angle) * 25 + Math.sin(angle) * 18,
+    opacity: 0.35 + (1 - radius) * 0.6,
+  };
+});
+---
+
+<svg viewBox="0 0 580 404" fill="none" aria-hidden="true" focusable="false">
+  <defs>
+    <pattern id="boids-preview-grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" stroke="#d9e1e6" stroke-width="0.7" />
+    </pattern>
+    <radialGradient id="boids-preview-paper">
+      <stop stop-color="#ffffff" />
+      <stop offset="1" stop-color="#edf2f5" />
+    </radialGradient>
+  </defs>
+  <path fill="url(#boids-preview-paper)" d="M0 0h580v404H0z" />
+  <path fill="url(#boids-preview-grid)" opacity="0.55" d="M0 0h580v404H0z" />
+  <ellipse cx="290" cy="202" rx="208" ry="124" stroke="#cbd6de" stroke-dasharray="3 8" opacity="0.8" />
+  <ellipse cx="290" cy="202" rx="138" ry="80" stroke="#d4dde3" opacity="0.8" />
+  {birds.map(bird => (
+    <path d="M9 0-6-4-2 0-6 4Z" fill="#426a84" opacity={bird.opacity} transform={`translate(${bird.x} ${bird.y}) rotate(${bird.rotation})`} />
+  ))}
+  <path d="M25 40V25h15M540 25h15v15M555 364v15h-15M40 379H25v-15" stroke="#a4b6c2" stroke-width="1" />
+</svg>
