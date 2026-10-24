@@ -4,10 +4,55 @@ import { getCollection, render } from "astro:content";
 import Info from "../../components/Info.astro";
 import "github-markdown-css/github-markdown-light.css";
 
+const [profiles, summaries, jobs, projects, education, certifications] = await Promise.all([
+  getCollection("cv"),
+  getCollection("summary"),
+  getCollection("work"),
+  getCollection("projects"),
+  getCollection("education"),
+  getCollection("certifications"),
+]);
+
+const entries = [
+  ...summaries.map(entry => ({ entry, section: "summary", heading: "", subtitle: "" })),
+  ...jobs.map(entry => ({
+    entry,
+    section: entry.data.section ?? "work",
+    heading: entry.data.company,
+    subtitle: `${entry.data.title} · ${entry.data.periodLabel ?? entry.data.period.raw}`,
+  })),
+  ...projects.map(entry => ({
+    entry,
+    section: "projects",
+    heading: entry.data.title,
+    subtitle: [entry.data.role, entry.data.period].filter(Boolean).join(" · "),
+  })),
+  ...education.map(entry => ({ entry, section: "education", heading: "", subtitle: "" })),
+  ...certifications.map(entry => ({ entry, section: "certifications", heading: "", subtitle: "" })),
+];
+
 const resumes = await Promise.all(
-  (await getCollection("cv"))
-    .sort((a, b) => (a.id === "zh" ? -1 : b.id === "zh" ? 1 : 0))
-    .map(async (entry) => ({ ...entry, ...(await render(entry)) })),
+  profiles
+    .sort((a, b) => a.id.localeCompare(b.id))
+    .map(async profile => {
+      const localized = await Promise.all(entries
+        .filter(({ entry }) => entry.data.lang === profile.id)
+        .sort((a, b) => (a.entry.data.sectionOrder ?? 0) - (b.entry.data.sectionOrder ?? 0)
+          || (("order" in a.entry.data ? a.entry.data.order : 0) - ("order" in b.entry.data ? b.entry.data.order : 0)))
+        .map(async item => ({ ...item, ...(await render(item.entry)) })));
+      const sections = [...new Set(localized.map(item => item.section))].map(key => ({
+        key,
+        title: localized.find(item => item.section === key)?.entry.data.sectionTitle,
+        items: localized.filter(item => item.section === key),
+      }));
+      return {
+        ...profile,
+        ...(await render(profile)),
+        sections,
+        linkedContacts: profile.data.contacts.filter(contact => contact.url),
+        pendingContacts: profile.data.contacts.filter(contact => !contact.url && contact.placeholder),
+      };
+    }),
 );
 ---
 
@@ -19,7 +64,7 @@ const resumes = await Promise.all(
       <button type="button" data-language="en" aria-controls="resume-en" aria-pressed="false">English</button>
     </div>
     <noscript><p>语言切换需要 JavaScript。/ Enable JavaScript to switch languages.</p></noscript>
-    {resumes.map(({ id, data, Content }) => (
+    {resumes.map(({ id, data, Content, sections, linkedContacts, pendingContacts }) => (
       <article id={`resume-${id}`} class="markdown-body" lang={id === "zh" ? "zh-CN" : "en"} hidden={id !== "zh"}>
         <header class="resume__header">
           <h1>{data.name}</h1>
@@ -27,17 +72,39 @@ const resumes = await Promise.all(
           <address>
             <Info href={`tel:${data.phone}`} iconName="device-mobile">{data.phone}</Info>
             <Info href={`mailto:${data.email}`} iconName="mail">{data.email}</Info>
+            {linkedContacts.map(contact => (
+              contact.label.toLowerCase() === "github" ? (
+                <Info href={contact.url!} iconName="mark-github">{contact.label}</Info>
+              ) : contact.label.toLowerCase() === "linkedin" ? (
+                <Info href={contact.url!} iconName="linkedin">{contact.label}</Info>
+              ) : (
+                <a href={contact.url}>{contact.label}</a>
+              )
+            ))}
           </address>
-          <aside class="resume__notice">
-            <strong>{data.contactNotice}</strong>
-            <ul>
-              {data.contacts.map((contact) => (
-                <li>{contact.url ? <a href={contact.url}>{contact.label}</a> : <span>{contact.label}: {contact.placeholder}</span>}</li>
-              ))}
-            </ul>
-          </aside>
+          {pendingContacts.length > 0 && (
+            <aside class="resume__notice">
+              <ul>
+                {pendingContacts.map(contact => (
+                  <li>{contact.label}: {contact.placeholder}</li>
+                ))}
+              </ul>
+            </aside>
+          )}
         </header>
         <Content />
+        {sections.map(section => (
+          <section data-section={section.key}>
+            <h2>{section.title}</h2>
+            {section.items.map(({ heading, subtitle, Content: EntryContent }) => (
+              <div class="resume__entry">
+                {heading && <h3>{heading}</h3>}
+                {subtitle && <p><strong>{subtitle}</strong></p>}
+                <EntryContent />
+              </div>
+            ))}
+          </section>
+        ))}
       </article>
     ))}
   </div>

@@ -13,13 +13,38 @@ export type IconName = keyof typeof octiconsData;
 // 2. 这里的 as IconName[] 将会完美工作，不会报任何类型找不到的错误
 const octicons = Object.keys(octiconsData) as IconName[];
 
+// Language metadata is optional so existing example entries remain valid.
+// CV rendering selects only entries matching the requested language.
+const localizedEntry = {
+  lang: z.enum(["zh", "en"]).optional(),
+  order: z.number().default(0),
+  sectionTitle: z.string().optional(),
+  sectionOrder: z.number().optional(),
+};
+
+const sectionCollection = (directory: string) => defineCollection({
+  loader: glob({ pattern: "*.md", base: `./src/content/${directory}` }),
+  schema: z.object({
+    lang: z.enum(["zh", "en"]),
+    sectionTitle: z.string(),
+    sectionOrder: z.number(),
+  }),
+});
+
+const summary = sectionCollection("summary");
+const education = sectionCollection("education");
+const certifications = sectionCollection("certifications");
+
 // 4. Define your collection(s)
 const projects = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/projects' }),
   schema: z.object({
+    ...localizedEntry,
+    role: z.string().optional(),
+    period: z.string().optional(),
     title: z.string().meta({ description: 'Project title/name' }),
-    icon: z.enum(octicons).meta({ description: 'Icon (via octicons)' }),
-    link: z.url().meta({ description: 'Link to project' }),
+    icon: z.enum(octicons).meta({ description: 'Icon (via octicons)' }).optional(),
+    link: z.url().meta({ description: 'Link to project' }).optional(),
     stack: z.array(z.string()).meta({ description: 'Tech stack' }).optional(),
   }),
 });
@@ -27,6 +52,9 @@ const projects = defineCollection({
 const work = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/work' }),
   schema: z.object({
+    ...localizedEntry,
+    section: z.enum(['work', 'internship']).optional(),
+    periodLabel: z.string().optional(),
     title: z.string().meta({ description: 'Job title' }),
     company: z.string(),
     period: z
@@ -67,12 +95,11 @@ const cv = defineCollection({
     title: z.string(),
     phone: z.string(),
     email: z.email(),
-    contactNotice: z.string(),
     contacts: z.array(z.object({
       label: z.string(),
-      placeholder: z.string(),
-      url: z.url().optional(),
-    })),
+      placeholder: z.string().trim().optional(),
+      url: z.string().trim().optional(),
+    })).default([]),
   }),
 });
 
@@ -102,4 +129,4 @@ const experiments = defineCollection({
   }),
 });
 
-export const collections = { posts, experiments, projects, work, cv };
+export const collections = { posts, experiments, projects, work, cv, summary, education, certifications };
