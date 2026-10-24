@@ -8,9 +8,25 @@ import remarkMath from "remark-math";
 export default defineConfig({
   output: "static",
 
+  vite: {
+    plugins: [{
+      name: "experiment-directory-index",
+      configureServer(server) {
+        // Production static hosts serve index.html for directories; match that in dev.
+        server.middlewares.use((request, _response, next) => {
+          request.url = request.url?.replace(
+            /^(\/experiments\/apps\/[^/?]+\/)(?=\?|$)/,
+            "$1index.html",
+          );
+          next();
+        });
+      },
+    }],
+  },
+
   markdown: {
     processor: unified({
-      remarkPlugins: [remarkMath],
+      remarkPlugins: [[remarkMath, { singleDollarTextMath: true }]],
       rehypePlugins: [rehypeKatex],
     }),
   },
